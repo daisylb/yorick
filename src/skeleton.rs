@@ -10,7 +10,7 @@ pub trait Skeleton {
 }
 
 pub trait SkeletonFile {
-    fn path(&self) -> Box<&Path>;
+    fn path(&self) -> &Path;
     fn contents(&self) -> Result<Box<Read>>;
 }
 
@@ -22,18 +22,18 @@ impl Skeleton for FsSkeleton {
     type File = FsFile;
     fn files(&self) -> Box<Iterator<Item=FsFile>> {
         return Box::new(WalkDir::new(self.root.as_path()).into_iter().map(|entry| FsFile {
-            path: Box::new(entry.unwrap().path().to_path_buf())
+            path: entry.unwrap().path().to_path_buf()
         }))
     }
 }
 
 pub struct FsFile {
-    path: Box<PathBuf>,
+    path: PathBuf,
 }
 
 impl SkeletonFile for FsFile {
-    fn path(&self) -> Box<&Path> {
-        Box::new(self.path.as_path())
+    fn path(&self) -> &Path {
+        self.path.as_path()
     }
     fn contents(&self) -> Result<Box<Read>> {
         let file = File::open(self.path.as_path())?;
