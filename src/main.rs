@@ -1,9 +1,11 @@
 extern crate walkdir;
 
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use skeleton::{Skeleton, SkeletonFile};
+use output::Output;
 
 mod skeleton;
+mod output;
 
 fn main() {
     let skel = skeleton::FsSkeleton { root: PathBuf::from("..") };
@@ -13,4 +15,8 @@ fn main() {
         file.contents().unwrap().read(contents);
         println!("start: {:?}", contents);
     }
+
+    let outp = output::FsOutput { root: PathBuf::from("./tmp") };
+    let mut writer = outp.get_writer(Path::new("foo")).unwrap();
+    writer.write(b"Hello!");
 }
