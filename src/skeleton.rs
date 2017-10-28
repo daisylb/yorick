@@ -6,7 +6,7 @@ use std::iter::Iterator;
 
 pub trait Skeleton {
     type File: SkeletonFile;
-    fn files(&self) -> Box<Iterator<Item=Self::File>>;
+    fn files(&self) -> Box<Iterator<Item = Self::File>>;
 }
 
 pub trait SkeletonFile {
@@ -20,10 +20,10 @@ pub struct FsSkeleton {
 
 impl Skeleton for FsSkeleton {
     type File = FsFile;
-    fn files(&self) -> Box<Iterator<Item=FsFile>> {
-        return Box::new(WalkDir::new(self.root.as_path()).into_iter().map(|entry| FsFile {
-            path: entry.unwrap().path().to_path_buf()
-        }))
+    fn files(&self) -> Box<Iterator<Item = FsFile>> {
+        return Box::new(WalkDir::new(self.root.as_path()).into_iter().map(|entry| {
+            FsFile { path: entry.unwrap().path().to_path_buf() }
+        }));
     }
 }
 
