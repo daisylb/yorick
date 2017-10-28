@@ -15,9 +15,9 @@ impl Output for FsOutput {
         assert!(path.is_relative());
         let file_path = self.root.join(&path);
         if let Some(parent) = file_path.parent() {
-            create_dir_all(parent.as_os_str())?;
+            create_dir_all(parent)?;
         }
-        let file = File::create(file_path.as_os_str())?;
+        let file = File::create(file_path.as_path())?;
         Ok(Box::new(file))
     }
 }
