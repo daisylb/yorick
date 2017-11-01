@@ -1,4 +1,5 @@
 extern crate walkdir;
+extern crate tempdir;
 
 use std::path::{Path, PathBuf};
 use skeleton::{Skeleton, SkeletonFile};

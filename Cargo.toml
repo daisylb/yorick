@@ -5,3 +5,4 @@ authors = ["Adam Brenecki"]
 
 [dependencies]
 walkdir = "2"
+tempdir = "0.3"
