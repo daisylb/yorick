@@ -16,6 +16,7 @@ pub trait SkeletonFile: Sized {
     fn contents(&self) -> Result<Box<Read>>;
 }
 
+#[derive(Debug)]
 pub struct FsSkeleton {
     pub root: PathBuf,
 }
@@ -23,20 +24,23 @@ pub struct FsSkeleton {
 impl Skeleton for FsSkeleton {
     type File = FsFile;
     fn files(&self) -> Box<Iterator<Item = FsFile>> {
+        let root = self.root.clone();
         return Box::new(WalkDir::new(self.root.as_path()).into_iter()
         .map(|entry| entry.unwrap())
         .filter(|entry| entry.file_type().is_file())
-        .map(|entry| {
-            let f = FsFile {
-                path: entry.path().to_path_buf(),
-            };
-            f
+        .map(move |entry| {
+            println!("{:?}", root);
+            FsFile {
+                full_path: entry.path().to_path_buf(),
+                path: entry.path().strip_prefix(&root).unwrap().to_path_buf(),
+            }
         }));
     }
 }
 
 pub struct FsFile {
     path: PathBuf,
+    full_path: PathBuf,
 }
 
 impl SkeletonFile for FsFile {
@@ -44,7 +48,7 @@ impl SkeletonFile for FsFile {
         self.path.as_path()
     }
     fn contents(&self) -> Result<Box<Read>> {
-        let file = File::open(self.path.as_path())?;
+        let file = File::open(self.full_path.as_path())?;
         Ok(Box::new(BufReader::new(file)))
     }
 }
