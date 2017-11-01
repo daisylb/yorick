@@ -25,16 +25,19 @@ impl Skeleton for FsSkeleton {
     type File = FsFile;
     fn files(&self) -> Box<Iterator<Item = FsFile>> {
         let root = self.root.clone();
-        return Box::new(WalkDir::new(self.root.as_path()).into_iter()
-        .map(|entry| entry.unwrap())
-        .filter(|entry| entry.file_type().is_file())
-        .map(move |entry| {
-            println!("{:?}", root);
-            FsFile {
-                full_path: entry.path().to_path_buf(),
-                path: entry.path().strip_prefix(&root).unwrap().to_path_buf(),
-            }
-        }));
+        return Box::new(
+            WalkDir::new(self.root.as_path())
+                .into_iter()
+                .map(|entry| entry.unwrap())
+                .filter(|entry| entry.file_type().is_file())
+                .map(move |entry| {
+                    println!("{:?}", root);
+                    FsFile {
+                        full_path: entry.path().to_path_buf(),
+                        path: entry.path().strip_prefix(&root).unwrap().to_path_buf(),
+                    }
+                }),
+        );
     }
 }
 
@@ -54,7 +57,7 @@ impl SkeletonFile for FsFile {
 }
 
 #[test]
-fn test_fs_skeleton_reader(){
+fn test_fs_skeleton_reader() {
     let dir = TempDir::new("yorick-test-skeleton-reader").unwrap();
 
     // write content
@@ -65,7 +68,7 @@ fn test_fs_skeleton_reader(){
     file1.write(b"QUX").unwrap();
 
     // test skeleton
-    let skel = FsSkeleton{ root: dir.path().to_path_buf() };
+    let skel = FsSkeleton { root: dir.path().to_path_buf() };
     let mut file_map = HashMap::new();
     for file in skel.files() {
         let mut contents = Vec::new();
@@ -76,5 +79,8 @@ fn test_fs_skeleton_reader(){
     assert_eq!(file_map.len(), 2);
     println!("files read: {:?}", file_map);
     assert_eq!(file_map.get(Path::new("foo")).unwrap().as_slice(), b"FOO");
-    assert_eq!(file_map.get(Path::new("bar/baz")).unwrap().as_slice(), b"QUX");
+    assert_eq!(
+        file_map.get(Path::new("bar/baz")).unwrap().as_slice(),
+        b"QUX"
+    );
 }

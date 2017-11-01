@@ -24,9 +24,9 @@ impl Output for FsOutput {
 }
 
 #[test]
-fn test_fs_output(){
+fn test_fs_output() {
     let dir = TempDir::new("yorick-test-output").unwrap();
-    let out = FsOutput{ root: dir.path().to_path_buf() };
+    let out = FsOutput { root: dir.path().to_path_buf() };
 
     // writing to the root of the directory
     let mut writer = out.get_writer(Path::new("foo")).unwrap();
