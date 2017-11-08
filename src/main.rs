@@ -1,3 +1,10 @@
+#[macro_use]
+extern crate serde_derive;
+#[macro_use]
+extern crate maplit;
+
+extern crate serde;
+extern crate toml;
 extern crate walkdir;
 extern crate tempdir;
 
@@ -7,6 +14,7 @@ use output::Output;
 
 mod skeleton;
 mod output;
+mod config;
 
 fn main() {
     let skel = skeleton::FsSkeleton { root: PathBuf::from("..") };
