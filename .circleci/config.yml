@@ -26,3 +26,17 @@ jobs:
           command: cargo build --release
       - store_artifacts:
           path: target/release/yorick
+  build-macos:
+    docker:
+      - image: rust:1.21.0
+    working_directory: ~/repo
+    steps:
+      - checkout
+      - run:
+          name: Install cross-compilation target
+          command: rustup target add x86_64-apple-darwin
+      - run:
+          name: Build for release
+          command: cargo build --release --target=x86_64-apple-darwin
+      - store_artifacts:
+          path: target/release/yorick
