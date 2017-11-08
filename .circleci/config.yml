@@ -24,3 +24,5 @@ jobs:
       - run:
           name: Build for release
           command: cargo build --release
+      - store_artifacts:
+          path: target/release/yorick
