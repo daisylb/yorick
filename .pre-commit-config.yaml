@@ -19,6 +19,6 @@ repos:
     -   id: rustfmt
         name: rustfmt
         description: 'This hook runs rustfmt, which must be installed.'
-        entry: rustfmt --skip-children
+        entry: rustfmt
         language: system
         files: \.rs$

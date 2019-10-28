@@ -1,10 +1,10 @@
+use std::fs::{create_dir_all, File};
+use std::io::{Read, Result, Write};
 use std::path::{Path, PathBuf};
-use std::io::{Result, Write, Read};
-use std::fs::{File, create_dir_all};
 use tempdir::TempDir;
 
 pub trait Output {
-    fn get_writer(&self, &Path) -> Result<Box<Write>>;
+    fn get_writer(&self, _: &Path) -> Result<Box<dyn Write>>;
 }
 
 pub struct FsOutput {
@@ -12,7 +12,7 @@ pub struct FsOutput {
 }
 
 impl Output for FsOutput {
-    fn get_writer(&self, path: &Path) -> Result<Box<Write>> {
+    fn get_writer(&self, path: &Path) -> Result<Box<dyn Write>> {
         assert!(path.is_relative());
         let file_path = self.root.join(&path);
         if let Some(parent) = file_path.parent() {
@@ -26,7 +26,9 @@ impl Output for FsOutput {
 #[test]
 fn test_fs_output() {
     let dir = TempDir::new("yorick-test-output").unwrap();
-    let out = FsOutput { root: dir.path().to_path_buf() };
+    let out = FsOutput {
+        root: dir.path().to_path_buf(),
+    };
 
     // writing to the root of the directory
     let mut writer = out.get_writer(Path::new("foo")).unwrap();

@@ -1,19 +1,19 @@
-use std::path::{Path, PathBuf};
-use walkdir::WalkDir;
-use std::io::{BufReader, Read, Result, Write};
-use std::fs::{File, create_dir};
-use std::iter::Iterator;
 use std::collections::HashMap;
+use std::fs::{create_dir, File};
+use std::io::{BufReader, Read, Result, Write};
+use std::iter::Iterator;
+use std::path::{Path, PathBuf};
 use tempdir::TempDir;
+use walkdir::WalkDir;
 
 pub trait Skeleton {
     type File: SkeletonFile;
-    fn files(&self) -> Box<Iterator<Item = Self::File>>;
+    fn files(&self) -> Box<dyn Iterator<Item = Self::File>>;
 }
 
 pub trait SkeletonFile: Sized {
     fn path(&self) -> &Path;
-    fn contents(&self) -> Result<Box<Read>>;
+    fn contents(&self) -> Result<Box<dyn Read>>;
 }
 
 #[derive(Debug)]
@@ -23,7 +23,7 @@ pub struct FsSkeleton {
 
 impl Skeleton for FsSkeleton {
     type File = FsFile;
-    fn files(&self) -> Box<Iterator<Item = FsFile>> {
+    fn files(&self) -> Box<dyn Iterator<Item = FsFile>> {
         let root = self.root.clone();
         return Box::new(
             WalkDir::new(self.root.as_path())
@@ -50,7 +50,7 @@ impl SkeletonFile for FsFile {
     fn path(&self) -> &Path {
         self.path.as_path()
     }
-    fn contents(&self) -> Result<Box<Read>> {
+    fn contents(&self) -> Result<Box<dyn Read>> {
         let file = File::open(self.full_path.as_path())?;
         Ok(Box::new(BufReader::new(file)))
     }
@@ -68,7 +68,9 @@ fn test_fs_skeleton_reader() {
     file1.write(b"QUX").unwrap();
 
     // test skeleton
-    let skel = FsSkeleton { root: dir.path().to_path_buf() };
+    let skel = FsSkeleton {
+        root: dir.path().to_path_buf(),
+    };
     let mut file_map = HashMap::new();
     for file in skel.files() {
         let mut contents = Vec::new();
